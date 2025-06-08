@@ -18,7 +18,7 @@ class Course(BaseModel):
     course_code: str
     course_name: str
     credits: conint(gt=0)
-    grade: constr(regex="^(A\+|A|B\+|B|C\+|C|D\+|D|F)$")
+    grade: constr(regex="^(A\\+|A|B\\+|B|C\\+|C|D\\+|D|F)$")
 
 # 전체 학생 정보
 class StudentRequest(BaseModel):
@@ -31,7 +31,8 @@ def calculate_score(data: StudentRequest):
     total_credits = sum(course.credits for course in data.courses)
     total_points = sum(course.credits * GRADE_TO_POINT[course.grade] for course in data.courses)
 
-    gpa = round(total_points / total_credits, 2) if total_credits > 0 else 0.0
+    gpa_raw = total_points / total_credits if total_credits > 0 else 0.0
+    gpa = round(gpa_raw + 1e-8, 2)
 
     return {
         "student_summary": {
